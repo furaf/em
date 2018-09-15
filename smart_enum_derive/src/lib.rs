@@ -28,7 +28,7 @@ fn impl_smart_enum(ast: &syn::DeriveInput, variants: Vec<syn::Variant>) -> quote
     quote! {
     #[allow(non_upper_case_globals)]
             const #dummy_const: () = {
-            impl ::exchange::SmartEnum for #name {
+            impl ::smart_enum::SmartEnum for #name {
                 const LENGTH: usize = #len;
 
                 fn values() -> &'static [Self] {
