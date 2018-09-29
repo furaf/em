@@ -10,7 +10,7 @@ impl <A: SmartEnum, B: SmartEnum> SmartEnum for (A, B) {
     const LENGTH: usize = A::LENGTH * B::LENGTH;
 
     fn values() -> &'static [Self] {
-        unimplemented!("Please implement.") // TODO[typesafe]: do it.
+        let A = unimplemented!("Implement me please :)"); // TODO[typesafe]: do it
     }
 
     fn as_usize(&self) -> usize {
@@ -24,7 +24,7 @@ impl <A: SmartEnum> SmartEnum for Option<A> {
     const LENGTH: usize = 1 + A::LENGTH;
 
     fn values() -> &'static [Self] {
-        unimplemented!("Please implement.") // TODO[typesafe]: do it.
+        let A = unimplemented!("Implement me please :)"); // TODO[typesafe]: do it
     }
 
     fn as_usize(&self) -> usize {
