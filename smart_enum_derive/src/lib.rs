@@ -24,21 +24,18 @@ fn impl_smart_enum(ast: &syn::DeriveInput, variants: Vec<syn::Variant>) -> quote
     let len = variants.len();
     let all_values: Vec<_> = variants.iter().map(|v| v.ident.clone()).collect();
     let names: Vec<_> = all_values.iter().map(|_| name.clone()).collect();
-    let dummy_const = syn::Ident::new(format!("_IMPL_SMART_ENUM_DERIVE_FOR_{}", name));
     quote! {
-    #[allow(non_upper_case_globals)]
-            const #dummy_const: () = {
-            impl ::smart_enum::SmartEnum for #name {
-                const LENGTH: usize = #len;
+        impl ::smart_enum::SmartEnum for #name {
+            const LENGTH: usize = #len;
+            type ValuesType = ::std::iter::Cloned<::std::slice::Iter<'static, #name>>;
 
-                fn values() -> &'static [Self] {
-                    &[ #( #names::#all_values ),*]
-                }
-
-                fn as_usize(&self) -> usize {
-                    self.clone() as usize
-                }
+            fn values() -> Self::ValuesType {
+                [ #( #names::#all_values ),*].iter().cloned()
             }
-    };
+
+            fn as_usize(&self) -> usize {
+                self.clone() as usize
+            }
         }
+    }
 }

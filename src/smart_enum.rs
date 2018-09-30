@@ -1,16 +1,44 @@
-pub trait SmartEnum: Clone {
+use itertools::Itertools;
+use itertools::Product;
+
+use std::iter::Cloned;
+use std::iter::Iterator;
+use std::iter::once;
+use std::iter::Chain;
+use std::iter::Once;
+use std::iter::Map;
+
+pub trait SmartEnum: Clone + 'static {
     const LENGTH: usize;
+    type ValuesType: Iterator<Item=Self> + Clone;
 
-    fn values() -> &'static [Self];
-
+    fn values() -> Self::ValuesType;
     fn as_usize(&self) -> usize;
 }
 
+#[derive(Copy, Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash, Serialize, Deserialize)]
+pub enum Empty {}
+
+impl SmartEnum for Empty {
+    const LENGTH: usize = 0;
+    type ValuesType = ::std::iter::Empty<Empty>;
+
+    fn values() -> Self::ValuesType {
+        ::std::iter::empty()
+    }
+
+    fn as_usize(&self) -> usize {
+        unreachable!("as_usize called on Empty")
+    }
+}
+
+
 impl <A: SmartEnum, B: SmartEnum> SmartEnum for (A, B) {
     const LENGTH: usize = A::LENGTH * B::LENGTH;
+    type ValuesType = Product<A::ValuesType, B::ValuesType>;
 
-    fn values() -> &'static [Self] {
-        let A = unimplemented!("Implement me please :)"); // TODO[typesafe]: do it
+    fn values() -> Self::ValuesType {
+        A::values().cartesian_product(B::values())
     }
 
     fn as_usize(&self) -> usize {
@@ -20,11 +48,16 @@ impl <A: SmartEnum, B: SmartEnum> SmartEnum for (A, B) {
     }
 }
 
+fn some<T>(x: T) -> Option<T> {
+    Some(x)
+}
+
 impl <A: SmartEnum> SmartEnum for Option<A> {
     const LENGTH: usize = 1 + A::LENGTH;
+    type ValuesType = Chain<Once<Self>, Map<A::ValuesType, fn(A) -> Option<A>>>;
 
-    fn values() -> &'static [Self] {
-        let A = unimplemented!("Implement me please :)"); // TODO[typesafe]: do it
+    fn values() -> Self::ValuesType {
+        once(None).chain(A::values().map(some as fn(A) -> Option<A>))
     }
 
     fn as_usize(&self) -> usize {

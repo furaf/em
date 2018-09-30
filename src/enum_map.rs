@@ -19,27 +19,21 @@ where
     where F: Fn(K) -> V, K: 'static
     {
         EnumMap {
-            data: K::values().iter().map(|e| factory(e.clone())).collect(),
+            data: K::values().map(|e| factory(e.clone())).collect(),
             phantom: PhantomData,
         }
     }
 
-    pub fn set_all<F>(&mut self, factory: F) where F: Fn(&K) -> V, K: 'static {
-        self.data = K::values().iter().map(|e| factory(e)).collect()
+    pub fn set_all<F>(&mut self, factory: F) where F: Fn(K) -> V, K: 'static {
+        self.data = K::values().map(|e| factory(e)).collect()
     }
 
-    pub fn iter(&self) -> EnumMapIter<K,V> {
-        EnumMapIter {
-            map: self,
-            curr: 0,
-        }
+    pub fn iter(&self) -> impl Iterator<Item=(K,&V)> {
+        K::values().zip(self.data.iter())
     }
 
-    pub fn iter_mut(&mut self) -> EnumMapIterMut<K,V> {
-        EnumMapIterMut {
-            map: self,
-            curr: 0,
-        }
+    pub fn iter_mut(&mut self) -> impl Iterator<Item=(K, &mut V)> {
+        K::values().zip(self.data.iter_mut())
     }
 }
 
@@ -80,51 +74,6 @@ impl<'a, K, V> IndexMut<&'a K> for EnumMap<K, V>
     }
 }
 
-pub struct EnumMapIter<'a, K, V>
-    where K:'a, V: 'a
-{
-    map: &'a EnumMap<K, V>,
-    curr: usize,
-}
-
-impl<'a, K, V> Iterator for EnumMapIter<'a, K, V>
-    where K: SmartEnum + Debug + Copy + 'static,
-{
-    type Item = (K, &'a V);
-
-    fn next(&mut self) -> Option<(K, &'a V)> {
-        if self.curr < self.map.data.len() {
-            let i = self.curr;
-            self.curr += 1;
-            Some((K::values()[i], &self.map.data[i]))
-        } else {
-            None
-        }
-    }
-}
-
-pub struct EnumMapIterMut<'a, K, V>
-    where K:'a, V: 'a
-{
-    map: &'a mut EnumMap<K, V>,
-    curr: usize,
-}
-
-impl<'a, K, V> Iterator for EnumMapIterMut<'a, K, V>
-    where K: SmartEnum + Debug + Copy + 'static,
-{
-    type Item = (K, &'a mut V);
-
-    fn next(&mut self) -> Option<(K, &'a mut V)> {
-        if self.curr < self.map.data.len() {
-            let i = self.curr;
-            self.curr += 1;
-            Some((K::values()[i], unsafe { &mut *(&mut self.map.data[i] as *mut _) }))
-        } else {
-            None
-        }
-    }
-}
 
 #[cfg(test)]
 mod enum_map_tests {

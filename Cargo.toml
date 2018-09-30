@@ -5,3 +5,8 @@ authors = ["Aleksander Fular <ntszar@gmail.com>", "Piotr Mis <piotrekmis@gmail.c
 
 [dev-dependencies]
 smart_enum_derive = {path = "../smart_enum_derive"}
+
+[dependencies]
+itertools = "*"
+serde = "*"
+serde_derive = "*"
