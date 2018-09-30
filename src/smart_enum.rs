@@ -1,7 +1,6 @@
 use itertools::Itertools;
 use itertools::Product;
 
-use std::iter::Cloned;
 use std::iter::Iterator;
 use std::iter::once;
 use std::iter::Chain;
@@ -14,22 +13,6 @@ pub trait SmartEnum: Clone + 'static {
 
     fn values() -> Self::ValuesType;
     fn as_usize(&self) -> usize;
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Hash, Serialize, Deserialize)]
-pub enum Empty {}
-
-impl SmartEnum for Empty {
-    const LENGTH: usize = 0;
-    type ValuesType = ::std::iter::Empty<Empty>;
-
-    fn values() -> Self::ValuesType {
-        ::std::iter::empty()
-    }
-
-    fn as_usize(&self) -> usize {
-        unreachable!("as_usize called on Empty")
-    }
 }
 
 

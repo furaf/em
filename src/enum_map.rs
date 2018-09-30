@@ -1,11 +1,13 @@
 use smart_enum::SmartEnum;
 
 use std::fmt::Debug;
+use std::fmt::Formatter;
+use std::fmt::Result;
 use std::marker::PhantomData;
 use std::ops::{Index, IndexMut};
 use std::iter::Iterator;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(PartialEq, Clone)]
 pub struct EnumMap<K, V> {
     data: Vec<V>,
     phantom: PhantomData<K>,
@@ -34,6 +36,27 @@ where
 
     pub fn iter_mut(&mut self) -> impl Iterator<Item=(K, &mut V)> {
         K::values().zip(self.data.iter_mut())
+    }
+}
+
+impl<K, V> Debug for EnumMap<K, V>
+    where
+        K: SmartEnum + Debug + Copy + PartialEq + 'static,
+        V: Debug
+{
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        // {"Ashley": "645-7689", "Daniel": "798-1364", "Robert": "956-1745", "Katie": "435-8291"}
+        write!(f, "{{")?;
+        let mut next_index = 1;
+        for (k, v) in self.iter() {
+            if next_index < K::LENGTH {
+                write!(f, "{:?}: {:?}, ", k, v)?;
+            } else {
+                write!(f, "{:?}: {:?}}}", k, v)?;
+            }
+            next_index += 1;
+        }
+        Ok(())
     }
 }
 
