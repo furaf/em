@@ -30,6 +30,20 @@ where
         self.data = K::values().map(|e| factory(e)).collect()
     }
 
+    pub fn val(&self, index: K) -> V
+    where V: Clone
+    {
+        self.data[index.as_usize()].clone()
+    }
+
+    pub fn get(&self, index: K) -> &V {
+        &self.data[index.as_usize()]
+    }
+
+    pub fn get_mut(&mut self, index: K) -> &mut V {
+        &mut self.data[index.as_usize()]
+    }
+
     pub fn iter(&self) -> impl Iterator<Item=(K,&V)> {
         K::values().zip(self.data.iter())
     }
@@ -61,39 +75,39 @@ impl<K, V> Debug for EnumMap<K, V>
 }
 
 impl<K, V> Index<K> for EnumMap<K, V>
-where K: SmartEnum
+    where K: SmartEnum + Debug + Copy + PartialEq + 'static
 {
     type Output = V;
 
     fn index(&self, index: K) -> &V {
-        &self.data[index.as_usize()]
+        self.get(index)
     }
 }
 
 impl<K, V> IndexMut<K> for EnumMap<K, V>
-where K: SmartEnum
+    where K: SmartEnum + Debug + Copy + PartialEq + 'static
 {
     fn index_mut(&mut self, index: K) -> &mut V {
-        &mut self.data[index.as_usize()]
+        self.get_mut(index)
     }
 }
 
 
 impl<'a, K, V> Index<&'a K> for EnumMap<K, V>
-    where K: SmartEnum
+    where K: SmartEnum + Debug + Copy + PartialEq + 'static
 {
     type Output = V;
 
     fn index(&self, index: &K) -> &V {
-        &self.data[index.as_usize()]
+        self.get(*index)
     }
 }
 
 impl<'a, K, V> IndexMut<&'a K> for EnumMap<K, V>
-    where K: SmartEnum
+    where K: SmartEnum + Debug + Copy + PartialEq + 'static
 {
     fn index_mut(&mut self, index: &K) -> &mut V {
-        &mut self.data[index.as_usize()]
+        self.get_mut(*index)
     }
 }
 
