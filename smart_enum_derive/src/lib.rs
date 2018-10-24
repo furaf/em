@@ -25,7 +25,7 @@ fn impl_smart_enum(ast: &syn::DeriveInput, variants: Vec<syn::Variant>) -> quote
     let all_values: Vec<_> = variants.iter().map(|v| v.ident.clone()).collect();
     let names: Vec<_> = all_values.iter().map(|_| name.clone()).collect();
     quote! {
-        impl em::SmartEnum for #name {
+        impl ::em::SmartEnum for #name {
             const LENGTH: usize = #len;
             type ValuesType = ::std::iter::Cloned<::std::slice::Iter<'static, #name>>;
 
