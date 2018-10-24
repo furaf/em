@@ -1,12 +1,11 @@
 [package]
-name = "smart_enum"
+name = "em"
 version = "0.1.0"
 authors = ["Aleksander Fular <ntszar@gmail.com>", "Piotr Mis <piotrekmis@gmail.com>"]
 
-[dev-dependencies]
-smart_enum_derive = {path = "../smart_enum_derive"}
-
 [dependencies]
-itertools = "*"
-serde = "*"
-serde_derive = "*"
+itertools = "0.7"
+serde = "1"
+serde_derive = "1"
+
+smart_enum_derive = {path = "smart_enum_derive"}
